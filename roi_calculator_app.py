@@ -179,7 +179,7 @@ st.markdown("""
 st.write(
     "Demonstrate the financial impact of cloud remote management. Security dealers can calculate exactly how much "
     "they protect their contract margins by transitioning from expensive physical dispatches ('truck rolls') "
-    "to Cielo 365 [cite: 52, 57]."
+    "to Cielo 365."
 )
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -200,7 +200,7 @@ monthly_trips = st.slider(
     min_value=0, 
     max_value=100, 
     value=15,
-    help="How many times a month a tech must drive to a client site for minor adjustments, badge enrollments, or door schedules [cite: 47, 57]."
+    help="How many times a month a tech must drive to a client site for minor adjustments, badge enrollments, or door schedules."
 )
 
 trip_cost = st.number_input(
@@ -209,11 +209,10 @@ trip_cost = st.number_input(
     max_value=500, 
     value=150,
     step=25,
-    help="The fully loaded cost of a vehicle dispatch, including fuel, technician labor rates, and vehicle overhead. Standard industry benchmarks are $150–$300+ ."
+    help="The fully loaded cost of a vehicle dispatch, including fuel, technician labor rates, and vehicle overhead. Standard industry benchmarks are $150–$300+."
 )
 
 # 6. ROI Math Engine
-# Remote cloud management eliminates up to 90% of physical service dispatches by enabling cloud configuration
 current_annual_cost = monthly_trips * trip_cost * 12
 estimated_cloud_savings = current_annual_cost * 0.90 
 
@@ -225,8 +224,8 @@ with col1:
     st.markdown(f"""
         <div class="result-card loss-card">
             <div class="cost-header">Current Annual Operating Loss</div>
-            <div class="value-display">$ [cite: 57]{current_annual_cost:,.0f}</div>
-            <div class="desc-text">Capital lost purely to on-site vehicle travel, fuel, and technician field hours for routine configurations [cite: 57].</div>
+            <div class="value-display">${current_annual_cost:,.0f}</div>
+            <div class="desc-text">Capital lost purely to on-site vehicle travel, fuel, and technician field hours for routine configurations.</div>
         </div>
     """, unsafe_allow_html=True)
 
@@ -235,13 +234,13 @@ with col2:
         <div class="result-card savings-card">
             <div class="savings-header">Cielo 365 Recovered Profit</div>
             <div class="value-display">${estimated_cloud_savings:,.0f}</div>
-            <div class="desc-text">Net annual profit recovered by diagnosing hardware, adjusting pulse times, and issuing credentials remotely [cite: 47, 52].</div>
+            <div class="desc-text">Net annual profit recovered by diagnosing hardware, adjusting pulse times, and issuing credentials remotely.</div>
         </div>
     """, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 8. Fixed Call-to-Action Link Redirect (Corporate Orange Hover, Opens in New Tab)
+# 8. Call-to-Action Link Redirect
 st.link_button(
     "🚀 Start Your Free Trial on try.cielo365.com", 
     "https://try.cielo365.com", 
