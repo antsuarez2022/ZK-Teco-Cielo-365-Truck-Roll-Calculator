@@ -1,3 +1,4 @@
+
 import streamlit as st
 
 # 1. Page Configuration
@@ -54,6 +55,14 @@ st.markdown("""
         font-weight: 600;
     }
 
+    /* Transparent Form Styling */
+    div[data-testid="stForm"] {
+        background-color: rgba(30, 41, 59, 0.3) !important;
+        border: 1px solid #334155 !important;
+        border-radius: 12px !important;
+        padding: 25px !important;
+    }
+
     /* Streamlit Slider and Widget Styling */
     div[data-testid="stSlider"] {
         padding-bottom: 10px;
@@ -84,6 +93,25 @@ st.markdown("""
         color: #ffffff !important;
         border: 1px solid #475569 !important;
         border-radius: 4px !important;
+    }
+
+    /* Form Submit (Calculate) Button Customization */
+    div[data-testid="stFormSubmitButton"] button {
+        background-color: #ff6a00 !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 10px 20px !important;
+        font-weight: 700 !important;
+        border-radius: 8px !important;
+        width: 100% !important;
+        transition: all 0.3s ease !important;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    div[data-testid="stFormSubmitButton"] button:hover {
+        background-color: #e05d00 !important;
+        box-shadow: 0 4px 15px rgba(255, 106, 0, 0.4) !important;
     }
 
     /* Premium Result Card Styling */
@@ -143,23 +171,26 @@ st.markdown("""
         line-height: 1.4;
     }
 
-    /* Custom Styling for the Call-to-Action Link Button */
+    /* Custom Styling for the Trial Link Button */
     div.stLinkButton > a {
-        background-color: #ff6a00 !important;
-        color: #ffffff !important;
-        border: none !important;
+        background-color: transparent !important;
+        color: #ff6a00 !important;
+        border: 2px solid #ff6a00 !important;
         padding: 12px 24px !important;
         font-weight: 700 !important;
         border-radius: 8px !important;
-        box-shadow: 0 4px 14px 0 rgba(255, 106, 0, 0.3) !important;
         transition: all 0.3s ease !important;
         text-transform: uppercase;
         letter-spacing: 0.02em;
+        display: block;
+        text-align: center;
+        text-decoration: none;
     }
 
     div.stLinkButton > a:hover {
-        background-color: #e05d00 !important;
-        box-shadow: 0 6px 20px 0 rgba(255, 106, 0, 0.5) !important;
+        background-color: #ff6a00 !important;
+        color: #ffffff !important;
+        box-shadow: 0 6px 20px 0 rgba(255, 106, 0, 0.3) !important;
         transform: translateY(-1px);
     }
     </style>
@@ -184,65 +215,81 @@ st.write(
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 5. Interactive Configuration Inputs
+# Use Streamlit Session State to persist calculation results between interactions
+if 'calculated' not in st.session_state:
+    st.session_state.calculated = False
+    st.session_state.current_annual_cost = 0.0
+    st.session_state.estimated_cloud_savings = 0.0
+
+# 5. Interactive Configuration Form
 st.markdown("### ⚙️ Partner Operations Profile")
 
-locations = st.slider(
-    "How many customer locations does your business support?", 
-    min_value=1, 
-    max_value=150, 
-    value=20,
-    help="The total number of facilities or physical entry points currently under active maintenance contracts."
-)
+with st.form(key="roi_form"):
+    locations = st.slider(
+        "How many customer locations does your business support?", 
+        min_value=1, 
+        max_value=150, 
+        value=20,
+        help="The total number of facilities or physical entry points currently under active maintenance contracts."
+    )
 
-monthly_trips = st.slider(
-    "Average number of physical service trips (truck rolls) per month?", 
-    min_value=0, 
-    max_value=100, 
-    value=15,
-    help="How many times a month a tech must drive to a client site for minor adjustments, badge enrollments, or door schedules."
-)
+    monthly_trips = st.slider(
+        "Average physical service trips (truck rolls) per month, PER location?", 
+        min_value=0, 
+        max_value=10, 
+        value=1,
+        help="How many times a month a tech drives to a specific client site for minor adjustments or configurations."
+    )
 
-trip_cost = st.number_input(
-    "Estimated average cost per service trip ($)?", 
-    min_value=50, 
-    max_value=500, 
-    value=150,
-    step=25,
-    help="The fully loaded cost of a vehicle dispatch, including fuel, technician labor rates, and vehicle overhead. Standard industry benchmarks are $150–$300+."
-)
+    trip_cost = st.number_input(
+        "Estimated average cost per service trip ($)?", 
+        min_value=50, 
+        max_value=500, 
+        value=150,
+        step=25,
+        help="The fully loaded cost of a vehicle dispatch, including fuel, technician labor rates, and vehicle overhead."
+    )
+    
+    # Physical submit button inside the form to trigger calculation
+    submit_button = st.form_submit_button(label="Calculate Savings & ROI")
 
-# 6. ROI Math Engine
-current_annual_cost = monthly_trips * trip_cost * 12
-estimated_cloud_savings = current_annual_cost * 0.90 
+# 6. ROI Math Engine (Runs ONLY when the button is pressed)
+if submit_button:
+    st.session_state.calculated = True
+    # Math scales correctly: locations * average monthly trips per location * cost per trip * 12 months
+    st.session_state.current_annual_cost = locations * monthly_trips * trip_cost * 12
+    st.session_state.estimated_cloud_savings = st.session_state.current_annual_cost * 0.90
 
-# 7. Metrics Side-by-Side Cards
-st.markdown("<br>", unsafe_allow_html=True)
-col1, col2 = st.columns(2)
+# 7. Metrics Side-by-Side Cards (Show only after clicking 'Calculate')
+if st.session_state.calculated:
+    st.markdown("<br>", unsafe_allow_html=True)
+    col1, col2 = st.columns(2)
 
-with col1:
-    st.markdown(f"""
-        <div class="result-card loss-card">
-            <div class="cost-header">Current Annual Operating Loss</div>
-            <div class="value-display">${current_annual_cost:,.0f}</div>
-            <div class="desc-text">Capital lost purely to on-site vehicle travel, fuel, and technician field hours for routine configurations.</div>
-        </div>
-    """, unsafe_allow_html=True)
+    with col1:
+        st.markdown(f"""
+            <div class="result-card loss-card">
+                <div class="cost-header">Current Annual Operating Loss</div>
+                <div class="value-display">${st.session_state.current_annual_cost:,.0f}</div>
+                <div class="desc-text">Capital lost purely to on-site vehicle travel, fuel, and technician field hours for routine configurations.</div>
+            </div>
+        """, unsafe_allow_html=True)
 
-with col2:
-    st.markdown(f"""
-        <div class="result-card savings-card">
-            <div class="savings-header">Cielo 365 Recovered Profit</div>
-            <div class="value-display">${estimated_cloud_savings:,.0f}</div>
-            <div class="desc-text">Net annual profit recovered by diagnosing hardware, adjusting pulse times, and issuing credentials remotely.</div>
-        </div>
-    """, unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+            <div class="result-card savings-card">
+                <div class="savings-header">Cielo 365 Recovered Profit</div>
+                <div class="value-display">${st.session_state.estimated_cloud_savings:,.0f}</div>
+                <div class="desc-text">Net annual profit recovered by diagnosing hardware, adjusting pulse times, and issuing credentials remotely.</div>
+            </div>
+        """, unsafe_allow_html=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
-# 8. Call-to-Action Link Redirect
-st.link_button(
-    "🚀 Start Your Free Trial on try.cielo365.com", 
-    "https://try.cielo365.com", 
-    use_container_width=True
-)
+    # 8. Call-to-Action Link Redirect
+    st.link_button(
+        "🚀 Start Your Free Trial on try.cielo365.com", 
+        "https://try.cielo365.com", 
+        use_container_width=True
+    )
+else:
+    st.info("👈 Enter your business parameters above and 
