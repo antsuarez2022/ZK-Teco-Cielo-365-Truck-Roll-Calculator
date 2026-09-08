@@ -2,32 +2,75 @@ import streamlit as st
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="Cielo 365 ROI Calculator", 
-    page_icon="💜", 
+    page_title="Cielo 365 Partner ROI Calculator", 
+    page_icon="⚡", 
     layout="centered"
 )
 
-# 2. Inject Custom Vibrant Purple Theme CSS
+# 2. Inject Custom Try.Cielo365.com Dark Slate & Corporate Orange Theme CSS
 st.markdown("""
     <style>
-    /* Gradient Background for the Entire App */
+    /* Dark Corporate Slate Background */
     .stApp {
-        background: linear-gradient(135deg, #1e0b36 0%, #090212 100%) !important;
-        color: #f3ebff !important;
+        background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
+        color: #f8fafc !important;
     }
     
-    /* Global Text Styling */
+    /* Typography Styling */
     h1, h2, h3, h4, p, label {
-        font-family: 'Inter', 'Helvetica Neue', sans-serif;
-        color: #f3ebff !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #f8fafc !important;
+    }
+
+    /* Try.Cielo365.com Styled Header */
+    .brand-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 0;
+        border-bottom: 1px solid #334155;
+        margin-bottom: 25px;
+    }
+    
+    .logo-text {
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+    }
+    
+    .logo-cielo {
+        color: #ffffff !important;
+    }
+    
+    .logo-365 {
+        color: #ff6a00 !important; /* ZKTeco/Cielo Corporate Orange */
+    }
+    
+    .tagline {
+        font-size: 0.85rem;
+        color: #94a3b8 !important;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    /* Streamlit Slider and Widget Styling */
+    div[data-testid="stSlider"] {
+        padding-bottom: 10px;
+    }
+    
+    /* Make slider labels bright and highly legible */
+    div[data-testid="stWidgetLabel"] p {
+        font-size: 1rem !important;
+        font-weight: 500 !important;
+        color: #cbd5e1 !important;
     }
 
     /* Input Field Customization */
     div[data-baseweb="input"] {
-        background-color: #2d124d !important;
-        border-radius: 10px !important;
-        border: 1px solid #9d4edd !important;
-        color: #ffffff !important;
+        background-color: #1e293b !important;
+        border-radius: 8px !important;
+        border: 1px solid #475569 !important;
     }
     
     input {
@@ -37,123 +80,170 @@ st.markdown("""
     /* Style for Streamlit Number Input Controls (+ / - buttons) */
     button[data-testid="stNumberInputStepDown"], 
     button[data-testid="stNumberInputStepUp"] {
-        background-color: #3c1e63 !important;
+        background-color: #334155 !important;
         color: #ffffff !important;
-        border: 1px solid #9d4edd !important;
-        border-radius: 5px !important;
+        border: 1px solid #475569 !important;
+        border-radius: 4px !important;
     }
 
-    /* Container Styling for Results Cards */
+    /* Premium Result Card Styling */
     .result-card {
-        background: rgba(45, 18, 77, 0.45);
+        background: rgba(30, 41, 59, 0.5);
         padding: 24px;
-        border-radius: 16px;
-        border: 1px solid #9d4edd;
-        box-shadow: 0 8px 32px 0 rgba(157, 78, 221, 0.2);
+        border-radius: 12px;
+        border: 1px solid #334155;
+        box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.3);
         margin-top: 15px;
         margin-bottom: 15px;
         text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .result-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.4);
+    }
+
+    .loss-card {
+        border-left: 5px solid #ef4444 !important; /* Crimson Alert Red */
+    }
+
+    .savings-card {
+        border-left: 5px solid #ff6a00 !important; /* Glowing Orange Brand Accent */
+        background: rgba(255, 106, 0, 0.05) !important;
     }
 
     .cost-header {
-        color: #ff6b8b !important;
-        font-size: 1.1rem;
+        color: #f87171 !important;
+        font-size: 0.95rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
 
     .savings-header {
-        color: #2ecc71 !important;
-        font-size: 1.1rem;
+        color: #ff6a00 !important;
+        font-size: 0.95rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
 
     .value-display {
-        font-size: 2.5rem;
+        font-size: 2.8rem;
         font-weight: 800;
         margin: 12px 0;
         color: #ffffff !important;
+        letter-spacing: -0.02em;
     }
 
     .desc-text {
-        font-size: 0.9rem;
-        color: #d1bbf2 !important;
+        font-size: 0.85rem;
+        color: #94a3b8 !important;
+        line-height: 1.4;
+    }
+
+    /* Custom Styling for the Call-to-Action Link Button */
+    div.stLinkButton > a {
+        background-color: #ff6a00 !important;
+        color: #ffffff !important;
+        border: none !important;
+        padding: 12px 24px !important;
+        font-weight: 700 !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 14px 0 rgba(255, 106, 0, 0.3) !important;
+        transition: all 0.3s ease !important;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    div.stLinkButton > a:hover {
+        background-color: #e05d00 !important;
+        box-shadow: 0 6px 20px 0 rgba(255, 106, 0, 0.5) !important;
+        transform: translateY(-1px);
     }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. Header & Introduction
-st.title("💜 Cielo 365 Partner ROI Calculator")
+# 3. Custom Header Element
+st.markdown("""
+    <div class="brand-header">
+        <div class="logo-text">
+            <span class="logo-cielo">cielo</span><span class="logo-365">365</span>
+        </div>
+        <div class="tagline">Empower Access, Elevate Security</div>
+    </div>
+""", unsafe_allow_html=True)
+
+# 4. Description
 st.write(
-    "Calculate how much your physical security dealership can save by shifting "
-    "from high-cost physical dispatches ('truck rolls') to remote cloud access control."
+    "Demonstrate the financial impact of cloud remote management. Security dealers can calculate exactly how much "
+    "they protect their contract margins by transitioning from expensive physical dispatches ('truck rolls') "
+    "to Cielo 365 [cite: 52, 57]."
 )
 
-st.markdown("---")
+st.markdown("<br>", unsafe_allow_html=True)
 
-# 4. Interactive Input Sliders (Low Friction)
-st.subheader("⚙️ Enter Your Business Numbers")
+# 5. Interactive Configuration Inputs
+st.markdown("### ⚙️ Partner Operations Profile")
 
 locations = st.slider(
-    "How many customer locations do you manage?", 
+    "How many customer locations does your business support?", 
     min_value=1, 
-    max_value=100, 
-    value=15,
-    help="The total number of building entry systems or controller panels you support."
+    max_value=150, 
+    value=20,
+    help="The total number of facilities or physical entry points currently under active maintenance contracts."
 )
 
 monthly_trips = st.slider(
-    "Average service trips (truck rolls) per month?", 
+    "Average number of physical service trips (truck rolls) per month?", 
     min_value=0, 
-    max_value=50, 
-    value=10,
-    help="How many times a technician drives a van out to handle minor configs, credential issues, or diagnostics."
+    max_value=100, 
+    value=15,
+    help="How many times a month a tech must drive to a client site for minor adjustments, badge enrollments, or door schedules [cite: 47, 57]."
 )
 
 trip_cost = st.number_input(
-    "Average cost per physical service trip ($)?", 
+    "Estimated average cost per service trip ($)?", 
     min_value=50, 
     max_value=500, 
     value=150,
     step=25,
-    help="Standard industry truck rolls cost between $150 and $300+ in fuel, wear, and labor."
+    help="The fully loaded cost of a vehicle dispatch, including fuel, technician labor rates, and vehicle overhead. Standard industry benchmarks are $150–$300+ ."
 )
 
-# 5. Core ROI Math
-# Cielo 365 cloud-based remote management can reduce physical maintenance trips by up to 90%
+# 6. ROI Math Engine
+# Remote cloud management eliminates up to 90% of physical service dispatches by enabling cloud configuration
 current_annual_cost = monthly_trips * trip_cost * 12
 estimated_cloud_savings = current_annual_cost * 0.90 
 
-# 6. Side-by-Side Visual Cards
+# 7. Metrics Side-by-Side Cards
 st.markdown("<br>", unsafe_allow_html=True)
 col1, col2 = st.columns(2)
 
 with col1:
     st.markdown(f"""
-        <div class="result-card" style="border-color: #ff3366;">
-            <div class="cost-header">Current Annual Loss</div>
-            <div class="value-display">${current_annual_cost:,.0f}</div>
-            <div class="desc-text">Spent annually on truck dispatches, fuel, and technician field labor.</div>
+        <div class="result-card loss-card">
+            <div class="cost-header">Current Annual Operating Loss</div>
+            <div class="value-display">$ [cite: 57]{current_annual_cost:,.0f}</div>
+            <div class="desc-text">Capital lost purely to on-site vehicle travel, fuel, and technician field hours for routine configurations [cite: 57].</div>
         </div>
     """, unsafe_allow_html=True)
 
 with col2:
     st.markdown(f"""
-        <div class="result-card" style="border-color: #2ecc71;">
-            <div class="savings-header">Cielo 365 Net Savings</div>
+        <div class="result-card savings-card">
+            <div class="savings-header">Cielo 365 Recovered Profit</div>
             <div class="value-display">${estimated_cloud_savings:,.0f}</div>
-            <div class="desc-text">Retained profits by resolving up to 90% of service issues remotely.</div>
+            <div class="desc-text">Net annual profit recovered by diagnosing hardware, adjusting pulse times, and issuing credentials remotely [cite: 47, 52].</div>
         </div>
     """, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 7. Redirection Link Button (Fixed to prevent page refresh loop!)
+# 8. Fixed Call-to-Action Link Redirect (Corporate Orange Hover, Opens in New Tab)
 st.link_button(
-    "🚀 Start Saving Today — Try Cielo 365 Free", 
+    "🚀 Start Your Free Trial on try.cielo365.com", 
     "https://try.cielo365.com", 
     use_container_width=True
 )
