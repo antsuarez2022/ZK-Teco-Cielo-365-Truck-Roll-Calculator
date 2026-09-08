@@ -1,142 +1,159 @@
 import streamlit as st
 
-# Configure the page
+# 1. Page Configuration
 st.set_page_config(
-    page_title="ZKTeco Cielo 365 - ROI Calculator",
-    page_icon="🔑",
+    page_title="Cielo 365 ROI Calculator", 
+    page_icon="💜", 
     layout="centered"
 )
 
-# Professional branding and styling
+# 2. Inject Custom Vibrant Purple Theme CSS
 st.markdown("""
     <style>
-    .main {
-        background-color: #fafafa;
+    /* Gradient Background for the Entire App */
+    .stApp {
+        background: linear-gradient(135deg, #1e0b36 0%, #090212 100%) !important;
+        color: #f3ebff !important;
     }
-    .stButton>button {
-        background-color: #ff9800;
-        color: white;
-        border-radius: 8px;
-        font-weight: bold;
-        height: 3em;
-        width: 100%;
-        border: none;
+    
+    /* Global Text Styling */
+    h1, h2, h3, h4, p, label {
+        font-family: 'Inter', 'Helvetica Neue', sans-serif;
+        color: #f3ebff !important;
     }
-    .stButton>button:hover {
-        background-color: #e65100;
-        color: white;
+
+    /* Input Field Customization */
+    div[data-baseweb="input"] {
+        background-color: #2d124d !important;
+        border-radius: 10px !important;
+        border: 1px solid #9d4edd !important;
+        color: #ffffff !important;
     }
-    .highlight-box {
-        padding: 20px;
-        border-radius: 10px;
-        margin: 10px 0px;
-        border-left: 5px solid #ff9800;
-        background-color: #fff3e0;
+    
+    input {
+        color: #ffffff !important;
+    }
+
+    /* Style for Streamlit Number Input Controls (+ / - buttons) */
+    button[data-testid="stNumberInputStepDown"], 
+    button[data-testid="stNumberInputStepUp"] {
+        background-color: #3c1e63 !important;
+        color: #ffffff !important;
+        border: 1px solid #9d4edd !important;
+        border-radius: 5px !important;
+    }
+
+    /* Container Styling for Results Cards */
+    .result-card {
+        background: rgba(45, 18, 77, 0.45);
+        padding: 24px;
+        border-radius: 16px;
+        border: 1px solid #9d4edd;
+        box-shadow: 0 8px 32px 0 rgba(157, 78, 221, 0.2);
+        margin-top: 15px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .cost-header {
+        color: #ff6b8b !important;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .savings-header {
+        color: #2ecc71 !important;
+        font-size: 1.1rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .value-display {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 12px 0;
+        color: #ffffff !important;
+    }
+
+    .desc-text {
+        font-size: 0.9rem;
+        color: #d1bbf2 !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Title & Description
-st.title("🔑 ZKTeco Cielo 365")
-st.subheader("Partner ROI Calculator: Eliminate Costly 'Truck Rolls'")
+# 3. Header & Introduction
+st.title("💜 Cielo 365 Partner ROI Calculator")
 st.write(
-    "When physical security dealers drive to a client's building for simple "
-    "tasks (like changing a keycard or adjusting a door timer), it costs "
-    "time, fuel, and labor. We call this a **'truck roll'**. "
-    "Cielo 365 lets you handle these tasks **remotely** from the cloud."
+    "Calculate how much your physical security dealership can save by shifting "
+    "from high-cost physical dispatches ('truck rolls') to remote cloud access control."
 )
 
 st.markdown("---")
 
-# Two-column layout for input and output
-col_input, col_space, col_output = st.columns([1.2, 0.1, 1.2])
+# 4. Interactive Input Sliders (Low Friction)
+st.subheader("⚙️ Enter Your Business Numbers")
 
-with col_input:
-    st.markdown("### 📊 Your Business Numbers")
-    
-    # 1. Number of client sites
-    locations = st.number_input(
-        "How many client locations do you manage?",
-        min_value=1,
-        value=20,
-        step=1,
-        help="The total number of commercial offices/buildings you service."
-    )
-    
-    # 2. Number of physical trips (truck rolls) per month
-    monthly_trips = st.number_input(
-        "How many service trips (truck rolls) do you make per month?",
-        min_value=0,
-        value=12,
-        step=1,
-        help="The total number of times you dispatch a technician in a vehicle to fix a minor issue."
-    )
-    
-    # 3. Average cost per trip
-    trip_cost = st.slider(
-        "Average cost per service trip ($)",
-        min_value=50,
-        max_value=500,
-        value=150,
-        step=10,
-        help="Includes fuel, vehicle wear-and-tear, and technician hourly wages."
-    )
-    
-    # 4. Monthly cloud fee per location
-    cielo_fee = st.number_input(
-        "Estimated Cielo 365 fee per location ($/month)",
-        min_value=1,
-        value=10,
-        step=1,
-        help="Standard subscription licensing cost per cloud-connected building."
-    )
+locations = st.slider(
+    "How many customer locations do you manage?", 
+    min_value=1, 
+    max_value=100, 
+    value=15,
+    help="The total number of building entry systems or controller panels you support."
+)
 
-# THE ROI MATH
-# Current costs
-current_monthly_trips_cost = monthly_trips * trip_cost
-current_annual_trips_cost = current_monthly_trips_cost * 12
+monthly_trips = st.slider(
+    "Average service trips (truck rolls) per month?", 
+    min_value=0, 
+    max_value=50, 
+    value=10,
+    help="How many times a technician drives a van out to handle minor configs, credential issues, or diagnostics."
+)
 
-# Cloud-managed costs (remote diagnostics reduce routine trips by 90%)
-new_monthly_trips = monthly_trips * 0.10
-new_monthly_trips_cost = new_monthly_trips * trip_cost
+trip_cost = st.number_input(
+    "Average cost per physical service trip ($)?", 
+    min_value=50, 
+    max_value=500, 
+    value=150,
+    step=25,
+    help="Standard industry truck rolls cost between $150 and $300+ in fuel, wear, and labor."
+)
 
-# Total cloud platform cost
-monthly_cielo_sub_cost = locations * cielo_fee
-total_annual_cielo_cost = (new_monthly_trips_cost + monthly_cielo_sub_cost) * 12
+# 5. Core ROI Math
+# Cielo 365 cloud-based remote management can reduce physical maintenance trips by up to 90%
+current_annual_cost = monthly_trips * trip_cost * 12
+estimated_cloud_savings = current_annual_cost * 0.90 
 
-# Savings
-net_annual_savings = current_annual_trips_cost - total_annual_cielo_cost
+# 6. Side-by-Side Visual Cards
+st.markdown("<br>", unsafe_allow_html=True)
+col1, col2 = st.columns(2)
 
-with col_output:
-    st.markdown("### 💰 Potential Cloud Savings")
-    
-    # Large metrics
-    st.error(f"**Current Annual Cost of Service Trips:**  \n**${current_annual_trips_cost:,.0f}**")
-    st.caption("Money lost on dispatching physical service vans for basic support.")
-    
-    st.info(f"**Annual Cielo 365 Cloud Investment:**  \n**${(monthly_cielo_sub_cost * 12):,.0f}**")
-    st.caption("Predictable, low-cost SaaS subscription fee.")
-    
-    # Clear visual box for the big win
-    st.markdown(
-        f"""
-        <div class="highlight-box">
-            <h4 style="margin:0; color:#e65100;">✨ Net Annual Savings:</h4>
-            <p style="font-size:28px; font-weight:bold; margin:5px 0px 0px 0px; color:#e65100;">
-                ${max(0.0, net_annual_savings):,.0f} / year
-            </p>
-            <span style="font-size:12px; color:#555;">
-                *Assumes 90% of routine settings & diagnostics are handled remotely via Cielo 365.
-            </span>
+with col1:
+    st.markdown(f"""
+        <div class="result-card" style="border-color: #ff3366;">
+            <div class="cost-header">Current Annual Loss</div>
+            <div class="value-display">${current_annual_cost:,.0f}</div>
+            <div class="desc-text">Spent annually on truck dispatches, fuel, and technician field labor.</div>
         </div>
-        """, 
-        unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
 
-st.markdown("---")
+with col2:
+    st.markdown(f"""
+        <div class="result-card" style="border-color: #2ecc71;">
+            <div class="savings-header">Cielo 365 Net Savings</div>
+            <div class="value-display">${estimated_cloud_savings:,.0f}</div>
+            <div class="desc-text">Retained profits by resolving up to 90% of service issues remotely.</div>
+        </div>
+    """, unsafe_allow_html=True)
 
-# Call to action
-st.markdown("### Ready to stop rolling trucks and start saving?")
-if st.button("🚀 Try Cielo 365 Free today at try.cielo365.com"):
-    st.balloons()
-    st.success("Redirecting to try.cielo365.com... (Simulated link)")
+st.markdown("<br>", unsafe_allow_html=True)
+
+# 7. Redirection Link Button (Fixed to prevent page refresh loop!)
+st.link_button(
+    "🚀 Start Saving Today — Try Cielo 365 Free", 
+    "https://try.cielo365.com", 
+    use_container_width=True
+)
